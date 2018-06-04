@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<H1 align="center">jQuery를 이용한 Ajax 테스트</H1>
+<h2>1. 버튼 클릭시 서버에게 값 전송</h2>
+이름 : <input type="text" id="myName"/>
+<button onclick="test1();">클릭</button>
+<hr>
+<script src="http://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+<script>
+	function test1(){
+		var myName=$("#myName").val();
+		$.ajax({
+			url : "/jQueryTest1",
+			data : {name : myName},
+			type : "get",
+			success : function(){
+				console.log("서버로 값 전송 성공");
+			},
+			error : function(){
+				console.log("서버로 값 전송 실패");
+			},
+			complete : function(){
+				console.log("성공이든 실패든 무조건 호출됨");
+			}
+		});
+	}
+</script>
+
+<h2>2. 버튼 클릭시 서버에서 보낼 값을 브라우저에서 출력</h2>
+<button onclick="test2();">클릭하세요</button>
+<p id="p1" style="width: 300px; height: 50px; border: 1px solid red"></p>
+<script>
+	function test2(){
+		$.ajax({
+			url : "/test2",
+			type : "get",
+			success : function(data){//data는 서버에서 보낸 값
+				$("#p1").text(data);
+			},
+			error : function(){
+				
+			},
+			complete : function(){
+				
+			}
+		});
+	}
+</script>
+<hr>
+<h2>3. 서버로 기본값 전송하고, 결과를 받아 출력</h2>
+첫번째 수 : <input type="text" id="su1"/>
+두번째 수 : <input type="text" id="su2"/>
+<button onclick="test3();">결과 확인</button><br>
+결과 : <p id="result3" style="width:300px; height: 50px; border: 1px solid red;"></p>
+<script>
+	function test3(){
+		var su1 = $('#su1').val();
+		var su2 = $('#su2').val();
+		console.log(su1);
+		$.ajax({
+			url : "/test3",
+			type : "get",
+			data : {su1:su1, su2:su2},
+			success : function(data){
+				$("#result3").text(data);
+			},
+			error : function(){
+				console.log("서버로 값 전송 실패");
+			}
+		});
+	}
+</script>
+<hr>
+<h2>4. 서버로 Object 형태의 데이터 전송, 서버에서 처리 </h2>
+이름 : <input type="text" id="studentName"/><br>
+나이 : <input type="text" id="studentAge"/><br>
+주소 : <input type="text" id="studentAddr"/><br>
+<button onclick="test4();">결과확인</button>
+<script>
+	function test4(){
+		var studentName=$('#studentName').val();
+		var studentAge=$('#studentAge').val();
+		var studentAddr=$('#studentAddr').val();
+		
+		var student = {name:studentName, age:studentAge, addr:studentAddr};
+		console.log(student);
+		$.ajax({
+			url : "/test4",
+			type : "get",
+			data : student,
+			success : function(){
+				console.log("성공");
+			},
+			error : function(){
+				console.log("실패");
+			}
+			
+		});
+	}
+</script>
+<hr>
+<h2>5. 서버에게 기본 데이터 전송 후 객체 리턴</h2>
+유저 번호 입력 : <input type="text" id="userIndex" onchange="test5();"/>
+<p id="result5" style="width:300px; height: 50px; border: 1px solid red;"></p>
+<script>
+	function test5(){
+		var userIndex = $('#userIndex').val();
+		$.ajax({
+			url : "/test5",
+			type : "get",
+			data : {userIndex : userIndex},
+			success : function(data){
+				console.log("성공");
+				$("#result5").html("이름 : "+data.name+"<br>"
+						+"나이 : "+data.age+"<br>"
+						+"주소 : "+data.addr+"<br>");
+			},
+			error : function(){
+				console.log("실패");
+			}
+		});
+	}
+</script>
+<h2>6. 기본값을 전송, 서버에서 리스트 객체 반환</h2>
+<h6>(유저번호 요청해서 유저 번호가 있으면 유저 정보, 없으면 전체 리턴)</h6>
+유저 정보(순번) : <input type="text" id="userIndex2" onchange="test6();"/>
+<p id="result6" style="width:300px; height: 50px; border: 1px solid red;"></p>
+<hr>
+<script>
+	function test6(){
+		var userIndex2 = $('#userIndex2').val();
+		$.ajax({
+			url : "/test6",
+			type : "get",
+			data : {userIndex2 : userIndex2},
+			success : function(data){
+				console.log("성공");
+				var result="";
+				for(var i=0;i<data.length;i++){
+					result+="이름 : "+data[i].name+" / "
+							+"나이 : "+data[i].age+" / "
+					+"주소 : "+data[i].addr+"<br>";
+				}
+				$("#result6").html(result);
+			},
+			error : function(){
+				console.log("실패");
+			}
+		});
+	}
+</script>
+<h2>7. 번호 여러개 전송하여 여러개의 리스트 반환</h2>
+유저 정보(번호, 번호, 번호) : <input type="text" id="userIndexs" onchange="test7();"/>
+<p id="result7" style="width:300px; height: 50px; border: 1px solid red;"></p>
+<hr>
+<script>
+	function test7(){
+		var userIndexs = $('#userIndexs').val();
+		$.ajax({
+			url:"/test7",
+			type:"get",
+			data:{userIndexs:userIndexs},
+			success : function(data){
+				console.log("성공");
+				var result="";
+				for(var i=0;i<data.length;i++){
+					result+="이름 : "+data[i].name+" / "
+							+"나이 : "+data[i].age+" / "
+					+"주소 : "+data[i].addr+"<br>";
+				}
+				$("#result7").html(result);
+			},
+			error:function(){
+				console.log("실패");
+			}
+		});
+	}
+</script>
+<h2>8. 번호 여러개 전송하여 여러개의 리스트 반환, 서버에서 맵형태의 객체 리턴</h2>
+유저 정보(번호, 번호, 번호) : <input type="text" id="userIndexs2" onchange="test8();"/>
+<p id="result8" style="width:300px; height: 50px; border: 1px solid red;"></p>
+<hr>
+<script>
+	function test8(){
+		var userIndexs2 = $('#userIndexs2').val();
+		$.ajax({
+			url : "/test8",
+			data : {userIndexs2:userIndexs2},
+			type : "get",
+			success : function(data){
+				console.log("성공");
+				var result="";
+				var keys = Object.keys(data);
+				for(var i=0;i<keys.length;i++){
+					result+="이름 : "+data[keys[i]].name+" / "
+							+"나이 : "+data[keys[i]].age+" / "
+					+"주소 : "+data[keys[i]].addr+"<br>";
+				}
+				$("#result8").html(result);
+			},
+			error : function(){
+				console.log("실패");
+			}
+		});
+	}
+</script>
+</body>
+</html>
